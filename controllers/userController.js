@@ -1,5 +1,6 @@
 
 let User = require("../models/User")
+let Post = require("../models/Post")
 
 exports.home = function (req, res) {
 
@@ -9,7 +10,7 @@ exports.home = function (req, res) {
 
     } else {
 
-        res.render('home-guest',{errors:req.flash("errors"), regError:req.flash("regError")})
+        res.render('home-guest',{regError:req.flash("regError")})
     }
 
 }
@@ -90,7 +91,20 @@ exports.ifUserExists = function(req,res,next){
     })
 
 }
+
+
 exports.createUserProfile = function(req,res){
+    
+
+    Post.findByAuthorId(req.profile._id,req.visitorId).then(function(posts){
+        res.render("profile-post",{
+            post:posts,
+            proUsername:req.profile.username,
+            proAvatar:req.profile.avatar})
+    
+
+    }).catch()
+
+
     console.log("rendering profile post "+req.profile.avatar+" "+req.profile.username)
-    res.render("profile-post",{proUsername:req.profile.username,proAvatar:req.profile.avatar})
-}
+    }

@@ -17,6 +17,18 @@ app.use(sessionOptions)
 
 app.use(function(req,res,next){
 
+    //make flash available to ejs file
+    res.locals.errors = req.flash("errors")
+    res.locals.success = req.flash("success")
+    //make current user id available to req object
+    if(req.session.user){
+        req.visitorId = req.session.user._id
+        console.log(" app js visitor id : "+req.visitorId)
+    }else{
+        
+        req.visitorId = 0
+    }
+    //make user session data available to ejs template
     res.locals.user = req.session.user
     next()
 })
