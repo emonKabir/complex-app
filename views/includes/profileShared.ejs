@@ -1,0 +1,23 @@
+
+    <h2><img class="avatar-small" src="<%= proAvatar %>"> <%=proUsername%> 
+      <% if(user && !isOwnerFollowing){
+
+        if(isFollowing){%>
+
+          <form class="ml-2 d-inline" action="/removeFollow/<%=proUsername%>" method="POST">
+          
+            <button class="btn btn-danger btn-sm">Stop Following <i class="fas fa-user-times"></i></button> 
+         </form>
+         <% } else{%>
+        <form class="ml-2 d-inline" action="/addFollow/<%=proUsername%>" method="POST">
+          <button class="btn btn-primary btn-sm">Follow <i class="fas fa-user-plus"></i></button>
+          
+        </form>
+    <%  }}%>
+    </h2>
+  
+    <div class="profile-nav nav nav-tabs pt-2 mb-4">
+      <a href="/profile/<%=proUsername%>" class="profile-nav-link nav-item nav-link <%=currentPage == 'posts' ? 'active':'' %>">Post <%=count.postCount%></a>
+      <a href="/profile/<%=proUsername%>/follower" class="profile-nav-link nav-item nav-link <%=currentPage == 'follower' ? 'active':'' %> ">Follower <%=count.followerCount%></a>
+      <a href="/profile/<%=proUsername%>/following" class="profile-nav-link nav-item nav-link <%=currentPage == 'following' ? 'active':'' %>">Following <%=count.followingCount%></a>
+    </div>
