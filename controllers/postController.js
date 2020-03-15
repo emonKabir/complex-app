@@ -1,4 +1,5 @@
 let Post = require("../models/Post")
+let User = require("../models/User")
 
 exports.viewCreateScreen = function(req,res){
 
@@ -29,6 +30,17 @@ exports.create = function(req,res){
         //res.send("something wrong : "+err)
     })
 }
+exports.apiCreate = function(req,res){
+
+   
+   let post = new Post(req.body,req.apiUser._id)
+    post.create().then(function(newId){
+        res.json("successfully posts")
+    
+    }).catch(function(err){
+       res.json(err) 
+    })
+}
 
 exports.createSinglePost = async function(req, res){
     
@@ -38,8 +50,8 @@ exports.createSinglePost = async function(req, res){
         let post = await Post.findSingleId(req.params.id,req.visitorId)
         
         console.log("postController visitor id: "+req.visitorId)
-        //res.send("this is fucking beautiful day")
-        res.render("post-single-screen",{post:post})
+        
+        res.render("post-single-screen",{post:post,title:post.title})
 
 
     }catch{
@@ -54,10 +66,6 @@ exports.createSinglePost = async function(req, res){
         try {
             
          let post =  await Post.findSingleId(req.params.id,req.visitorId)
-         //console.log("post collection author id : "+post.authorId)
-         //console.log("post collection visitor id : "+req.visitorId)
-         //console.log("post collection owner id : "+post.isOwnerId)
-         //res.render("editPost",{post:post})
         console.log(post.isOwnerId)
          if(post.isOwnerId){
             res.render("editPost",{post:post})
@@ -110,7 +118,20 @@ exports.editSinglePost = function(req,res){
     })
 
 }
+exports.apiFindPostByUser = async function(req,res){
 
+    try {
+        console.log("dhukchos tow!!")
+        let userDoc = await User.findUserByUserName(req.params.username)
+        console.log(userDoc)
+        let posts = await Post.findByAuthorId(userDoc._id)
+        console.log(posts)
+        res.json(posts)
+
+    } catch {
+        res.json("somossa")
+    }    
+}
 exports.deletePost = function(req,res){
         
        let post = Post.delete(req.params.id,req.visitorId).then(function(){
@@ -127,6 +148,20 @@ exports.deletePost = function(req,res){
         //res.send("lkdjflksajflksaj")
 
    
+}
+
+exports.apiDelete = function(req,res){
+        
+    let post = Post.delete(req.params.id,req.apiUser._id).then(function(){
+        
+        res.json("success")
+        
+     }).catch(()=>{
+        res.json("You dont have permission to delete this post")
+             })
+     //res.send("lkdjflksajflksaj")
+
+
 }
 
 exports.search = function(req,res){

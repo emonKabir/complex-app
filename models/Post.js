@@ -1,5 +1,6 @@
 
 const postCOllection = require("../db").db().collection("posts")
+const followCollection = require("../db").db().collection("follow")
 const ObjectID  = require("mongodb").ObjectID
 const User = require("./User")
 
@@ -39,7 +40,7 @@ Post.prototype.create = function(){
                 resolve(info.ops[0]._id)
         }).catch(()=>{
             this.errors.push("something is wrong! Please try again")
-            reject(this.errors)
+            resolve(this.errors)
         })
 
         }else{
@@ -195,5 +196,18 @@ Post.postCountById = function(id){
         let postCount = await postCOllection.countDocuments({author:id})
         resolve(postCount)
     })
+}
+Post.getFeed = function(id){
+ return new Promise(async(resolve,reject)=>{
+     let followedUsers = await followCollection.find({followingId:new ObjectID(id)}).toArray()
+     followedUsers = followedUsers.map(function(followUser){
+         return followUser.followedId
+     })
+     let posts = await Post.reusableFunction([
+         {$match:{author:{$in:followedUsers}}},
+         {$sort:{currentDate:-1}}
+     ])
+     resolve(posts)
+ })   
 }
 module.exports = Post

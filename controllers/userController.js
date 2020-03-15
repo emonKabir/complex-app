@@ -2,12 +2,14 @@
 let User = require("../models/User")
 let Post = require("../models/Post")
 let Follow = require("../models/Follow")
+const jwt = require("jsonwebtoken")
 
-exports.home = function (req, res) {
+exports.home = async function (req, res) {
 
     if (req.session.user) {
 
-        res.render("home-dashboard")
+        let posts  = await Post.getFeed(req.session.user._id)
+        res.render("home-dashboard",{posts:posts})
 
     } else {
 
@@ -16,8 +18,22 @@ exports.home = function (req, res) {
 
 }
 
-
-
+exports.checkUserNameExist = function(req,res){
+    User.findUserByUserName(req.body.username).then(function(response){
+        console.log("ekhane ki obostha : "+ response.username)
+        res.json(true)
+    }).catch(function(){
+        res.json(false)
+    })
+}
+exports.checkUserEmailExist = async function(req,res){
+   let email = await User.findUserByEmail(req.body.email)
+   if(email){
+       res.json(true)
+   }else{
+       res.json(false)
+   }
+}
 exports.logout = function (req, res) {
 
     //res.render('home-guest')
@@ -65,6 +81,17 @@ exports.login = function (req, res) {
 
     })
 }
+exports.apiLogin = function (req, res) {
+
+    let user = new User(req.body)
+    user.login().then(function (currentUser) {
+        //res.json("aajlakjfa")
+        res.json(jwt.sign({_id:currentUser._id},process.env.JWTSECRET,{expiresIn:"7d"}))
+    }).catch(function () {
+        res.json("incorrect user name and password")
+
+    })
+}
 
 exports.mustBeLoggedIn = function (req, res, next) {
 
@@ -75,6 +102,17 @@ exports.mustBeLoggedIn = function (req, res, next) {
         req.session.save(function () {
             res.redirect("/")
         })
+    }
+}
+
+exports.apiMustBeLoggedIn = function (req, res, next) {
+
+    try {
+        
+   req.apiUser = jwt.verify(req.body.token,process.env.JWTSECRET)
+   next()
+    } catch (error) {
+        res.json("invalid token")
     }
 }
 
@@ -100,6 +138,7 @@ exports.createUserProfile = function (req, res) {
     Post.findByAuthorId(req.profile._id, req.visitorId).then(function (posts) {
         res.render("profile-post", {
             currentPage:"posts",
+            title:req.profile.username,
             post: posts,
             proUsername: req.profile.username,
             proAvatar: req.profile.avatar,

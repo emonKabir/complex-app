@@ -7,7 +7,7 @@ const md5 = require("md5")
 let User  = function (data,getAvatar){
     this.data = data
     this.errors = []
-    if(getAvatar == undefined) {getAvatar   = false}
+    if(getAvatar == undefined) {getAvatar  = false}
    else if(getAvatar == true) {this.getAvatar()}
 }
 
@@ -27,7 +27,7 @@ User.prototype.validating = function(){
         if(this.data.username == "") {this.errors.push("user name field cant be empty")}
         if(this.data.username != "" && !validator.isAlphanumeric(this.data.username)) {this.errors.push("user name can only contains char and number")}
         if(!validator.isEmail(this.data.email)) {this.errors.push("email field cant be empty")}
-        if(this.data.password.length < 6) {this.errors.push("password must be contains 6 character")}
+        if(this.data.password.length < 4) {this.errors.push("password must be contains 6 character")}
     
         //let userName = this.data.username
         if(this.data.username.length > 2 && this.data.username.length < 31 && validator.isAlphanumeric(this.data.username)){
@@ -79,7 +79,8 @@ User.prototype.login = function () {
                 if(currentUser && bcrypt.compareSync(this.data.password,currentUser.password)){
                    this.data = currentUser
                     this.getAvatar() 
-                    resolve("congratulations")
+                    console.log(currentUser)
+                    resolve(currentUser)
                 }else{
                     reject("invalid user nmae or password")
                 }
@@ -126,6 +127,18 @@ User.prototype.login = function () {
         }).catch(function(){
             reject()
         })
+    })
+ }
+
+ User.findUserByEmail = function(email){
+
+    return new Promise(async function(resolve,reject){
+        let user = await userCOllection.findOne({email:email})
+        if(user){
+            resolve(true)
+        }else{
+            resolve(false)
+        }
     })
  }
 
