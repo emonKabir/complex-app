@@ -66,20 +66,31 @@ export default class RegistrationFormValidation {
     }
 
     formHandler(){
+        console.log("reg ekhane 222")
         this.usernameImmediatly()
         this.usernameRunDelay()
         this.userEmailRunDelay()
         this.userPasswordImmediatly()
         this.userPasswordRunDelay()
+        console.log("reg ekhane 1")
 
+        
         if(
+            
             this.username.isUnique && 
             !this.username.errors && 
-            this.email.isUnique && 
-            !this.email.errors &&
-            !this.userPassword.errors
-            ){
+            this.userEmail.isUnique && 
+            !this.userEmail.errors &&
+            !this.userPassword.errors ){
+            console.log("reg ekhane 2")
             this.form.submit()
+        }else{
+            console.log("eikhane error")
+            console.log(this.username.isUnique)
+            console.log(this.username.errors)
+            console.log(this.userEmail.isUnique)
+            console.log(this.userEmail.errors)
+            console.log(this.userPassword.errors)
         }
     }
     usernameHandler() {
@@ -93,7 +104,7 @@ export default class RegistrationFormValidation {
     userEmailHandler() {
         this.userEmail.errors = false
         clearTimeout(this.userEmail.timer)
-        this.userEmail.timer = setTimeout(() => this.userEmailRunDelay(), 2000)
+        this.userEmail.timer = setTimeout(() => this.userEmailRunDelay(), 1000)
 
     }
 
@@ -174,9 +185,9 @@ export default class RegistrationFormValidation {
                 if (response.data) {
                     console.log("response is again : " + response.data)
                     this.showValidationErrors(this.userEmail, "email already taken")
-                    this.username.isUnique = false
+                    this.userEmail.isUnique = false
                 } else {
-                    this.username.isUnique = true
+                    this.userEmail.isUnique = true
                     this.hideValidationErrors(this.userEmail)
                 }
             }).catch(() => {
