@@ -34,6 +34,6 @@
     "socket.io": "^2.3.0",
     "validator": "^12.0.0",
     "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.10"
+    "webpack-cli": "^3.3.12"
   }
 }
